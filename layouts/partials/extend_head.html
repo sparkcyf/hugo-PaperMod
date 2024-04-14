@@ -2,3 +2,9 @@
 {{- /*     Insert any custom code (web-analytics, resources, etc.) - it will appear in the <head></head> section of every page. */ -}}
 {{- /*     Can be overwritten by partial with the same name in the global layouts. */ -}}
 {{- /* Head custom content area end */ -}}
+<!-- callout scss -->
+{{ $callout_css := resources.Get "scss/callout.scss" | resources.ToCSS }}
+<link rel="stylesheet" href="{{ $callout_css.Permalink }}">
+<link rel="stylesheet" href="https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/disqusjs/3.0.2/styles/disqusjs.css">
+
+<script defer crossorigin="anonymous" src="/js/image-caption.js"></script>
