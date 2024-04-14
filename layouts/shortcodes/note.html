@@ -1,0 +1,5 @@
+<!-- layouts/shortcodes/note.html -->
+{{ $type := .Get 0 | default "info" }} <!-- 获取第一个参数，默认为 info -->
+<div class="callout callout-{{ $type }}">
+    {{ .Inner | markdownify }}
+</div>

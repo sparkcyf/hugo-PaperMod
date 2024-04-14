@@ -89,6 +89,13 @@
 {{- end }}
 {{- end -}}
 
+<!-- callout scss -->
+{{ $callout_css := resources.Get "scss/callout.scss" | resources.ToCSS }}
+<link rel="stylesheet" href="{{ $callout_css.Permalink }}">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/disqusjs@3.0/dist/browser/styles/disqusjs.css">
+
+<script defer crossorigin="anonymous" src="/js/image-caption.js"></script>
+
 {{- /* Favicons */}}
 <link rel="icon" href="{{ site.Params.assets.favicon | default "favicon.ico" | absURL }}">
 <link rel="icon" type="image/png" sizes="16x16" href="{{ site.Params.assets.favicon16x16 | default "favicon-16x16.png" | absURL }}">
