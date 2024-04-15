@@ -1,3 +1,9 @@
+<div class="callout callout-default">
+    <!-- use http://mirrors.creativecommons.org/presskit/buttons/88x31/svg/by-nc-sa.svg and embed svg -->
+    <img src="https://mirrors.creativecommons.org/presskit/buttons/88x31/svg/by-nc-sa.svg" alt="CC BY-NC-SA 4.0" style="width: 88px; height: 31px;">
+    <p style="font-size: 12px;" >Licensed Under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noopener">CC BY-NC-SA 4.0</a></p>
+    <p style="font-size: 12px;" >Post Link: <a href="{{ .Permalink }}" target="_blank" rel="noopener">{{ .Permalink }}</a></p>
+</div>
 {{- /* Comments area start */ -}}
 {{- /* to add comments read => https://gohugo.io/content-management/comments/ */ -}}
 <script src="https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/disqusjs/3.0.2/disqusjs.es2015.umd.min.js" crossorigin="anonymous"></script>
@@ -9,7 +15,7 @@ const disqusjs = new DisqusJS({
     identifier: '',
     url: '',
     title: '',
-    api: 'https://disqus.skk.moe/disqus/',
+    api: 'https://disqus.com/api/',
     apikey: 'QhJnXpS5igyHkjYQ91XYC4dSAuEJYAEsHX8hjLrRc1HU9AApOHLrqkwwIp2sKOLk',
     admin: '',
     adminLabel: ''
