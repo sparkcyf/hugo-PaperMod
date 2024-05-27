@@ -1,0 +1,187 @@
+<h3>{{ .Get "gallery-name" }}</h3>
+<div class="pswp-container" id="gallery-container-{{ .Get "id" }}">
+    <div class="photoswipe-gallery-module" id="gallery-module-{{ .Get "id" }}">
+        <!-- 动态生成的图片将插入到这里 -->
+    </div>
+</div>
+
+<script>
+    (function() {
+        const galleryId = "{{ .Get "id" }}";
+
+        // Intersection Observer 回调函数
+        function onIntersection(entries, observer) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    // 当画廊模块进入视口时，加载 PhotoSwipe 画廊
+                    loadGallery();
+                    observer.disconnect(); // 断开观察器，不再重复加载
+                }
+            });
+        }
+
+        // Intersection Observer 配置
+        const observerOptions = {
+            root: null, // 相对于视口
+            rootMargin: '0px',
+            threshold: 0.1 // 当至少 10% 的元素可见时触发
+        };
+
+        // 创建 Intersection Observer 实例
+        const observer = new IntersectionObserver(onIntersection, observerOptions);
+
+        // 开始观察画廊模块
+        observer.observe(document.getElementById(`gallery-module-${galleryId}`));
+
+        async function loadGallery() {
+            const module = await import('https://cdnjs.cloudflare.com/ajax/libs/photoswipe/5.3.3/photoswipe-lightbox.esm.min.js');
+            const PhotoSwipeLightbox = module.default;
+
+            // 定义一个函数来加载 JSON 数据
+            async function loadGalleryData(url) {
+                try {
+                    const response = await fetch(url);
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    const imageData = await response.json();
+                    await populateGallery(imageData);
+                } catch (error) {
+                    console.error('There has been a problem with your fetch operation:', error);
+                }
+            }
+
+            // 定义一个函数来根据 JSON 数据生成 HTML 结构并初始化 PhotoSwipe
+            async function populateGallery(imageData) {
+                const galleryContainer = document.getElementById(`gallery-module-${galleryId}`);
+
+                // 使用 Promise.all 并行加载图片，以便获取其原始尺寸
+                const imagePromises = imageData.map(item => {
+                    return new Promise((resolve, reject) => {
+                        const img = new Image();
+                        img.src = item.image;
+                        img.onload = () => {
+                            resolve({
+                                src: item.image,
+                                width: img.naturalWidth,
+                                height: img.naturalHeight,
+                                caption: item.caption
+                            });
+                        };
+                        img.onerror = reject;
+                    });
+                });
+
+                const images = await Promise.all(imagePromises);
+
+                images.forEach((item, index) => {
+                    const div = document.createElement('div');
+                    const a = document.createElement('a');
+                    const img = document.createElement('img');
+
+                    a.href = item.src;
+                    a.setAttribute('data-pswp-width', item.width);
+                    a.setAttribute('data-pswp-height', item.height);
+                    a.setAttribute('data-cropped', 'true');
+                    a.setAttribute('data-pswp-caption', item.caption); // 设置标题
+                    a.target = '_blank';
+
+                    img.src = item.src;
+                    img.alt = item.caption;
+                    img.loading = 'lazy';  // 添加懒加载属性
+
+                    a.appendChild(img);
+                    div.appendChild(a);
+                    galleryContainer.appendChild(div);
+                });
+
+                const options = {
+                    gallery: `#gallery-module-${galleryId}`,
+                    children: 'a',
+                    pswpModule: () => import('https://cdnjs.cloudflare.com/ajax/libs/photoswipe/5.3.3/photoswipe.esm.min.js')
+                };
+                            
+                const lightbox = new PhotoSwipeLightbox(options);
+                lightbox.on('uiRegister', function() {
+                    lightbox.pswp.ui.registerElement({
+                        name: 'custom-caption',
+                        order: 9,
+                        isButton: false,
+                        appendTo: 'root',
+                        html: 'Caption text',
+                        onInit: (el, pswp) => {
+                            lightbox.pswp.on('change', () => {
+                                const currSlideElement = lightbox.pswp.currSlide.data.element;
+                                let captionHTML = '';
+                                if (currSlideElement) {
+                                    const hiddenCaption = currSlideElement.querySelector('.hidden-caption-content');
+                                    if (hiddenCaption) {
+                                        // get caption from element with class hidden-caption-content
+                                        captionHTML = hiddenCaption.innerHTML;
+                                    } else {
+                                        // get caption from alt attribute
+                                        captionHTML = currSlideElement.querySelector('img').getAttribute('alt');
+                                    }
+                                }
+                                el.innerHTML = captionHTML || '';
+                            });
+                        }
+                    });
+                });
+                lightbox.init();
+            }
+
+            // 加载外部 JSON 数据
+            loadGalleryData('{{ .Get "jsonUrl" }}'); // 使用传入的 JSON 文件 URL 参数
+        }
+    })();
+</script>
+
+<style>
+    /* 独立样式，以避免与主题样式冲突 */
+    .pswp-container {
+        width: fit-content;
+        margin: 0 auto;
+        text-align: center;
+        margin-bottom: 40px; /* 防止重叠 */
+    }
+
+    .photoswipe-gallery-module {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: center;
+    }
+
+    .photoswipe-gallery-module div {
+        height: 150px;
+        width: 200px;
+    }
+
+    .photoswipe-gallery-module div a img {
+        height: 100%;
+        width: 100%;
+        object-fit: cover;
+    }
+
+    .pswp__custom-caption {
+        background: rgba(75, 150, 75, 0.75);
+        font-size: 16px;
+        color: #fff;
+        width: calc(100% - 32px);
+        max-width: 400px;
+        padding: 2px 8px;
+        border-radius: 4px;
+        position: absolute;
+        left: 50%;
+        bottom: 16px;
+        transform: translateX(-50%);
+    }
+    .pswp__custom-caption a {
+        color: #fff;
+        text-decoration: underline;
+    }
+    .hidden-caption-content {
+        display: none;
+    }
+</style>
