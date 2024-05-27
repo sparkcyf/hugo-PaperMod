@@ -1,6 +1,6 @@
 <h3>{{ .Get "gallery-name" }}</h3>
 <div class="pswp-container" id="gallery-container-{{ .Get "id" }}">
-    <div class="photoswipe-gallery-module" id="gallery-module-{{ .Get "id" }}">
+    <div class="photoswipe-gallery-module" id="pswp-gallery-module-{{ .Get "id" }}">
         <!-- 动态生成的图片将插入到这里 -->
     </div>
 </div>
@@ -31,10 +31,10 @@
         const observer = new IntersectionObserver(onIntersection, observerOptions);
 
         // 开始观察画廊模块
-        observer.observe(document.getElementById(`gallery-module-${galleryId}`));
+        observer.observe(document.getElementById(`pswp-gallery-module-${galleryId}`));
 
         async function loadGallery() {
-            const module = await import('https://cdnjs.cloudflare.com/ajax/libs/photoswipe/5.3.3/photoswipe-lightbox.esm.min.js');
+            const module = await import('https://cdnjs.cloudflare.com/ajax/libs/photoswipe/5.4.4/photoswipe-lightbox.esm.min.js');
             const PhotoSwipeLightbox = module.default;
 
             // 定义一个函数来加载 JSON 数据
@@ -53,7 +53,7 @@
 
             // 定义一个函数来根据 JSON 数据生成 HTML 结构并初始化 PhotoSwipe
             async function populateGallery(imageData) {
-                const galleryContainer = document.getElementById(`gallery-module-${galleryId}`);
+                const galleryContainer = document.getElementById(`pswp-gallery-module-${galleryId}`);
 
                 // 使用 Promise.all 并行加载图片，以便获取其原始尺寸
                 const imagePromises = imageData.map(item => {
@@ -96,9 +96,9 @@
                 });
 
                 const options = {
-                    gallery: `#gallery-module-${galleryId}`,
+                    gallery: `#pswp-gallery-module-${galleryId}`,
                     children: 'a',
-                    pswpModule: () => import('https://cdnjs.cloudflare.com/ajax/libs/photoswipe/5.3.3/photoswipe.esm.min.js')
+                    pswpModule: () => import('https://cdnjs.cloudflare.com/ajax/libs/photoswipe/5.4.4/photoswipe.esm.min.js')
                 };
                             
                 const lightbox = new PhotoSwipeLightbox(options);
