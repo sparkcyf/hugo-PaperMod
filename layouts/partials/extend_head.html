@@ -3,7 +3,7 @@
 {{- /*     Can be overwritten by partial with the same name in the global layouts. */ -}}
 {{- /* Head custom content area end */ -}}
 <!-- callout scss -->
-{{ $callout_css := resources.Get "scss/callout.scss" | resources.ToCSS }}
+{{ $callout_css := resources.Get "scss/callout.scss" | css.Sass }}
 <link rel="stylesheet" href="{{ $callout_css.Permalink }}">
 <link rel="stylesheet" href="https://s4.zstatic.net/ajax/libs/disqusjs/3.0.2/styles/disqusjs.css">
 {{ if .Params.photoswipe }}
